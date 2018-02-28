@@ -15,7 +15,7 @@ function define_parameters {
 	kmt_file_2km=${grids_path}'2km/kmt_2km.ieeer8'
 	angles_file_2km=${grids_path}'2km/anglet_2km.ieeer8'
 	thickness_file_2km=${grids_path}'2km/thickness_2km_600x640.txt'
-	mask_file='/Users/arturnowicki/IOPAN/data/grids/2km/hel_mask_2km.ieeer8'
+	mask_file=${grids_path}'2km/hel_mask_2km.ieeer8'
 
 	in_model_nc_prefix='hydro.pop.h.'
 	out_files_suffix='.ieeer8'
