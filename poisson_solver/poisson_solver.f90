@@ -22,9 +22,9 @@ program poissonSolver
     integer i,j,init,zctr,z_lev
     integer status
     integer in_x, in_y, in_z
-    character(len=max_len) in_f_name, out_f_name
+    character(len=max_len) in_f_name, out_f_name, mask_f_name
     character(len=5) in_xs, in_ys, in_zs
-    call read_input_parameters(in_f_name, out_f_name, in_xs, in_ys, in_zs, status)
+    call read_input_parameters(in_f_name, out_f_name, mask_f_name, in_xs, in_ys, in_zs, status)
     if(status .eq. -1) call handle_error(msg_missing_program_input_err, err_missing_program_input)
 
     read(in_xs,*)  in_x
@@ -55,31 +55,30 @@ program poissonSolver
         ! write(*,*) "bad_data", bad_org
         ! write(*, *) bad_org==bad_org
 
-        do i = 1,in_x
-            zctr=0
-            sum2=0.
-            meanv2=0.
-            do j=1,in_y
-                if(jnk(i,j).ne.bad_org) then
-                    zctr=zctr+1
-                    sum2=sum2+jnk(i,j)
-                endif
-            enddo
-            if(zctr==0) then
-                meanv2=0 !meanv
-            else
-                meanv2=sum2/dble(zctr)
+        do j = 1,in_y
+          zctr=0
+          sum2=0.
+          meanv2=0.
+          do i=1,in_x
+            if(jnk(i,j).ne.bad_org) then
+              zctr=zctr+1
+              sum2=sum2+jnk(i,j)
             endif
+          enddo
+          if(zctr.ne.0) then
+              meanv2=sum2/dble(zctr)
+          endif
+          do i=1,in_x
+            if(jnk(i,j).eq.bad_org .or. isnan(jnk(i,j))) then
+              ilevmsk(i,j) = 0
+              jnk(i,j) = meanv2
+            endif
+          enddo
         enddo
-        where (jnk.eq.bad_org .or. isnan(jnk))
-            ilevmsk = 0
-            tmp = meanv2
-        elsewhere
-            tmp = jnk
-        end where
+        tmp = jnk
 
         !data extrapolation using poisson solver
-        call extrap(tmp,ilevmsk,sor,res,in_x,in_y,ms,ct,'restart data',grid_type)
+        call extrap(tmp,ilevmsk,sor,res,in_x,in_y,ms,ct,'restart data',grid_type,mask_f_name)
         out_data(:, :, z_lev) = tmp
 
         ! write(*,*) minval(jnk)  , maxval(jnk)
@@ -90,18 +89,19 @@ program poissonSolver
     close(102)
 end program
 
-subroutine read_input_parameters(in_f_name, out_f_name, in_x, in_y, in_z, status)
+subroutine read_input_parameters(in_f_name, out_f_name, mask_f_name, in_x, in_y, in_z, status)
     implicit none
-    character(len=512), intent(out) :: in_f_name, out_f_name
+    character(len=512), intent(out) :: in_f_name, out_f_name, mask_f_name
     character(len=5) in_x, in_y, in_z
     integer, intent(out) :: status
     status = 0
     call getarg(1, in_f_name)
     call getarg(2, out_f_name)
-    call getarg(3, in_x)
-    call getarg(4, in_y)
-    call getarg(5, in_z)
-    if(in_f_name == '' .or. out_f_name == '' .or. &
+    call getarg(3, mask_f_name)
+    call getarg(4, in_x)
+    call getarg(5, in_y)
+    call getarg(6, in_z)
+    if(in_f_name == '' .or. out_f_name == '' .or. mask_f_name == '' .or. &
         in_x == '' .or. in_y == '' .or. in_z == '') status = -1
 end subroutine
 
@@ -116,7 +116,7 @@ end subroutine
 
 
 
-      subroutine extrap (a, land, sor, res, il, jl, maxscn, crit, text, gtype)
+      subroutine extrap (a, land, sor, res, il, jl, maxscn, crit, text, gtype, mask_f_name)
     implicit none
 !    inputs:
 
@@ -144,11 +144,11 @@ end subroutine
       logical done
 !#include "stdunits.h"
       integer :: gtype
-      character*(*) :: text
+      character*(*) :: text, mask_f_name
       real*8, parameter :: c0=0.0, p25=0.25
-      real*8, dimension(il,jl) :: a, land, res, sor
+      real*8, dimension(il,jl) :: a, land, res, sor, mask
       integer i,j,il,jl,n, maxscn
-      real*8 :: relc, crit, absres,resmax, minres, maxres
+      real*8 :: relc, crit, absres,resmax, minres, maxres, neighbours
 
 !-----------------------------------------------------------------------
 
@@ -159,7 +159,10 @@ end subroutine
 !          the initial guess field over land areas gets better with
 !          each call.
 !-----------------------------------------------------------------------
-
+    open(103,file=trim(mask_f_name),form='unformatted',status='old', & 
+          convert='big_endian',access='direct',recl=il*jl*8)
+    read(103,rec=1) mask
+    close(103)
 
 !    check on the grid type: atmosphere or ocean
 
@@ -195,13 +198,27 @@ end subroutine
         n    = n + 1
         do j=2,jl-1
           do i=2,il-1
-            if (j.gt.50 .and. j.lt.82 .and. i.gt.300 .and. i.lt.328) cycle
-            res(i,j) = p25*(a(i-1,j) + a(i+1,j) + a(i,j-1) + a(i,j+1)) - a(i,j)
-          enddo
-        enddo
-        do i=310, 325
-          do j=55, 83
-            res(i,j) = 0.5*(a(i+1,j) + a(i,j-1)) - a(i,j)
+            if(mask(i,j) .ne. 2) then
+              res(i,j) = p25*(a(i-1,j) + a(i+1,j) + a(i,j-1) + a(i,j+1)) - a(i,j)
+            else
+              neighbours = 1.
+              res(i,j) = res(i,j-1)
+              if(mask(i-1,j) == 1) then
+                neighbours = neighbours + 1
+                res(i,j) = res(i,j) + a(i-1, j)
+              endif
+              if(mask(i+1,j) == 1) then
+                neighbours = neighbours + 1
+                res(i,j) = res(i,j) + a(i+1, j)
+              endif
+              if(mask(i,j+1) == 1) then
+                neighbours = neighbours + 1
+                res(i,j) = res(i,j) + a(i, j+1)
+              endif
+              if(neighbours .ne. 0) then
+                res(i,j) = (res(i,j)/neighbours) - a(i,j)
+              endif
+            endif
           enddo
         enddo
 
@@ -254,7 +271,7 @@ end subroutine
 
       if (.not. done .and. n .le. maxscn) go to 100
 
-      ! write (6,99) text, n, resmax
+      write (6,99) text, n, resmax
 
    
 99    format (1x,'==> Extrapolated ',a15,' into land using ', i4, &
