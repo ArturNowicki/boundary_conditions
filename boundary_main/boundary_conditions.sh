@@ -15,7 +15,8 @@ function define_parameters {
 	kmt_file_2km=${grids_path}'2km/kmt_2km.ieeer8'
 	angles_file_2km=${grids_path}'2km/anglet_2km.ieeer8'
 	thickness_file_2km=${grids_path}'2km/thickness_2km_600x640.txt'
-	mask_file=${grids_path}'2km/hel_mask_2km.ieeer8'
+	bay_mask_file=${grids_path}'2km/bay_mask_2km.ieeer8'
+	open_sea_mask_file=${grids_path}'2km/bay_mask_2km.ieeer8'
 
 	in_model_nc_prefix='hydro.pop.h.'
 	out_files_suffix='.ieeer8'
@@ -141,7 +142,7 @@ function run_poisson_solver {
 		out_file=${bin_spread_dir}${in_file/${bin_tmp_dir}}
 		z_dim_str=${out_file:(-16):4}
 		let z_dim=10#${z_dim_str}
-		./poisson_solver ${in_file} ${out_file} ${mask_file} ${x_in} ${y_in} ${z_dim}
+		./poisson_solver ${in_file} ${out_file} ${open_sea_mask_file} ${x_in} ${y_in} ${z_dim}
 		if [ $? -ne 0 ]; then
 			exit
 		fi
@@ -204,6 +205,7 @@ else
 		# rm ${bin_tmp_dir}*${out_files_suffix}
 		# echo ${progress_status} > ${progress_file}
 	fi
+	exit
 	if [[ ${progress_status} -eq 4 ]]; then
 		run_interpolation
 		((progress_status++))

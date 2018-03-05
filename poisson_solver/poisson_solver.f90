@@ -16,9 +16,8 @@ program poissonSolver
 
     !--- data arrays
     real*8, dimension(:, :, :), allocatable :: in_data, out_data
-    real*8, dimension(:, :), allocatable :: jnk,tmp,ilevmsk,sor,res
-    real*8 sum2, meanv2
-    real*8 bad_org
+    real*8, dimension(:, :), allocatable :: jnk,ilevmsk,sor,res,mask
+    real*8 sum2, mean_val
     integer i,j,init,zctr,z_lev
     integer status
     integer in_x, in_y, in_z
@@ -34,10 +33,10 @@ program poissonSolver
     allocate(in_data(in_x, in_y, in_z))
     allocate(out_data(in_x, in_y, in_z))
     allocate(jnk(in_x, in_y))
-    allocate(tmp(in_x, in_y))
     allocate(ilevmsk(in_x, in_y))
     allocate(sor(in_x, in_y))
     allocate(res(in_x, in_y))
+    allocate(mask(in_x, in_y))
 
     open(101,file=trim(in_f_name),form='unformatted',status='old', & 
           convert='big_endian',access='direct',recl=in_x*in_y*in_z*8)
@@ -45,44 +44,42 @@ program poissonSolver
     close(101)
     open(102,file=trim(out_f_name),form='unformatted',status='replace', & 
           convert='big_endian',access='direct',recl=in_x*in_y*in_z*8)
+    open(103,file=trim(mask_f_name),form='unformatted',status='old', & 
+          convert='big_endian',access='direct',recl=in_x*in_y*8)
+    read(103,rec=1) mask
+    close(103)
 
 !----- read in data
     do z_lev=1,in_z
         init=1
         ilevmsk(:,:) = 1
         jnk(:,:) = dble(in_data(:,:, z_lev))
-        bad_org=jnk(10,10)
-        ! write(*,*) "bad_data", bad_org
-        ! write(*, *) bad_org==bad_org
 
+        zctr=0
+        sum2=0.
+        mean_val=0.
         do j = 1,in_y
-          zctr=0
-          sum2=0.
-          meanv2=0.
           do i=1,in_x
-            if(jnk(i,j).ne.bad_org) then
+            if(mask(i,j).eq.1) then
               zctr=zctr+1
               sum2=sum2+jnk(i,j)
             endif
           enddo
-          if(zctr.ne.0) then
-              meanv2=sum2/dble(zctr)
-          endif
-          do i=1,in_x
-            if(jnk(i,j).eq.bad_org .or. isnan(jnk(i,j))) then
-              ilevmsk(i,j) = 0
-              jnk(i,j) = meanv2
-            endif
-          enddo
         enddo
-        tmp = jnk
+        if(zctr.ne.0) then
+            mean_val=sum2/dble(zctr)
+        endif
+        where(mask.eq.0)
+          jnk = mean_val
+          ilevmsk = 0
+        endwhere
 
         !data extrapolation using poisson solver
-        call extrap(tmp,ilevmsk,sor,res,in_x,in_y,ms,ct,'restart data',grid_type,mask_f_name)
-        out_data(:, :, z_lev) = tmp
-
-        ! write(*,*) minval(jnk)  , maxval(jnk)
-        ! write(*,*) minval(tmp)  , maxval(tmp)
+        call extrap(jnk,ilevmsk,sor,res,in_x,in_y,ms,ct,'restart data',grid_type)
+        out_data(:, :, z_lev) = jnk
+        write(*,*) jnk(300,80), res(300,80)
+        write(*,*) minval(jnk)  , maxval(jnk)
+        write(*,*) minval(res)  , maxval(res)
         init=init+1
     enddo
     write(102, rec=1) out_data
@@ -116,7 +113,7 @@ end subroutine
 
 
 
-      subroutine extrap (a, land, sor, res, il, jl, maxscn, crit, text, gtype, mask_f_name)
+      subroutine extrap (a, land, sor, res, il, jl, maxscn, crit, text, gtype)
     implicit none
 !    inputs:
 
@@ -144,9 +141,9 @@ end subroutine
       logical done
 !#include "stdunits.h"
       integer :: gtype
-      character*(*) :: text, mask_f_name
+      character*(*) :: text
       real*8, parameter :: c0=0.0, p25=0.25
-      real*8, dimension(il,jl) :: a, land, res, sor, mask
+      real*8, dimension(il,jl) :: a, land, res, sor
       integer i,j,il,jl,n, maxscn
       real*8 :: relc, crit, absres,resmax, minres, maxres, neighbours
 
@@ -159,11 +156,6 @@ end subroutine
 !          the initial guess field over land areas gets better with
 !          each call.
 !-----------------------------------------------------------------------
-    open(103,file=trim(mask_f_name),form='unformatted',status='old', & 
-          convert='big_endian',access='direct',recl=il*jl*8)
-    read(103,rec=1) mask
-    close(103)
-
 !    check on the grid type: atmosphere or ocean
 
       if (gtype .ne. 1 .and. gtype .ne. 2) then
@@ -198,30 +190,9 @@ end subroutine
         n    = n + 1
         do j=2,jl-1
           do i=2,il-1
-            if(mask(i,j) .ne. 2) then
               res(i,j) = p25*(a(i-1,j) + a(i+1,j) + a(i,j-1) + a(i,j+1)) - a(i,j)
-            else
-              neighbours = 1.
-              res(i,j) = res(i,j-1)
-              if(mask(i-1,j) == 1) then
-                neighbours = neighbours + 1
-                res(i,j) = res(i,j) + a(i-1, j)
-              endif
-              if(mask(i+1,j) == 1) then
-                neighbours = neighbours + 1
-                res(i,j) = res(i,j) + a(i+1, j)
-              endif
-              if(mask(i,j+1) == 1) then
-                neighbours = neighbours + 1
-                res(i,j) = res(i,j) + a(i, j+1)
-              endif
-              if(neighbours .ne. 0) then
-                res(i,j) = (res(i,j)/neighbours) - a(i,j)
-              endif
-            endif
           enddo
         enddo
-
         res = res * sor
         a = a + res
         maxres = maxval(res)
