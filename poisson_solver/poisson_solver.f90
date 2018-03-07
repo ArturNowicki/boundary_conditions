@@ -15,10 +15,10 @@ program poissonSolver
     real(kind=dp), parameter :: bad = -99., ct = 1.e-5
 
     !--- data arrays
-    real*8, dimension(:, :, :), allocatable :: in_data, out_data
-    real*8, dimension(:, :), allocatable :: jnk,ilevmsk,sor,res,mask
-    real*8 sum2, mean_val
-    integer i,j,init,zctr,z_lev
+    real*8, dimension(:, :, :), allocatable :: in_data, out_data, mask
+    real*8, dimension(:, :), allocatable :: jnk, ilevmsk, sor, res
+    real*8 tmp_sum, mean_val
+    integer i, j, zctr, z_lev
     integer status
     integer in_x, in_y, in_z
     character(len=max_len) in_f_name, out_f_name, mask_f_name
@@ -32,11 +32,11 @@ program poissonSolver
 
     allocate(in_data(in_x, in_y, in_z))
     allocate(out_data(in_x, in_y, in_z))
+    allocate(mask(in_x, in_y, in_z))
     allocate(jnk(in_x, in_y))
     allocate(ilevmsk(in_x, in_y))
     allocate(sor(in_x, in_y))
     allocate(res(in_x, in_y))
-    allocate(mask(in_x, in_y))
 
     open(101,file=trim(in_f_name),form='unformatted',status='old', & 
           convert='big_endian',access='direct',recl=in_x*in_y*in_z*8)
@@ -45,43 +45,42 @@ program poissonSolver
     open(102,file=trim(out_f_name),form='unformatted',status='replace', & 
           convert='big_endian',access='direct',recl=in_x*in_y*in_z*8)
     open(103,file=trim(mask_f_name),form='unformatted',status='old', & 
-          convert='big_endian',access='direct',recl=in_x*in_y*8)
+          convert='big_endian',access='direct',recl=in_x*in_y*in_z*8)
     read(103,rec=1) mask
     close(103)
-
 !----- read in data
     do z_lev=1,in_z
-        init=1
         ilevmsk(:,:) = 1
         jnk(:,:) = dble(in_data(:,:, z_lev))
 
         zctr=0
-        sum2=0.
+        tmp_sum=0.
         mean_val=0.
         do j = 1,in_y
           do i=1,in_x
-            if(mask(i,j).eq.1) then
+            if(mask(i,j,z_lev).eq.1) then
               zctr=zctr+1
-              sum2=sum2+jnk(i,j)
+              tmp_sum=tmp_sum+jnk(i,j)
             endif
           enddo
         enddo
         if(zctr.ne.0) then
-            mean_val=sum2/dble(zctr)
+            mean_val=tmp_sum/dble(zctr)
         endif
-        where(mask.eq.0)
+        where(mask(:,:,z_lev).ne.1)
           jnk = mean_val
           ilevmsk = 0
         endwhere
-
         !data extrapolation using poisson solver
         call extrap(jnk,ilevmsk,sor,res,in_x,in_y,ms,ct,'restart data',grid_type)
         out_data(:, :, z_lev) = jnk
-        write(*,*) jnk(300,80), res(300,80)
-        write(*,*) minval(jnk)  , maxval(jnk)
-        write(*,*) minval(res)  , maxval(res)
-        init=init+1
     enddo
+    if(index(mask_f_name, 'bay') .ne. 0) then
+      do z_lev = 10,in_z
+        out_data(:,:,z_lev) = out_data(:,:,z_lev-1)
+      enddo
+    endif
+
     write(102, rec=1) out_data
     close(102)
 end program

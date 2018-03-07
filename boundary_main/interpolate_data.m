@@ -71,6 +71,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
         dateTime = splitString{1};
         varName = splitString{2};
         kIn = str2double(splitString{5});
+        suffix = splitString{7};
         fidIn = fopen(strcat(inFolder, inFile.name), 'r', 'b');
         inData = fread(fidIn, [iIn*jIn kIn], 'double');
         fclose(fidIn);
@@ -83,13 +84,13 @@ function intepolate_data(inFolder, outFolder, gridSize)
             for kk = 1:kOut
                 outData(:, :, kk) = griddata(cutLat, cutLong, cutData(:, :, kk), tLatOut, tLongOut, method3d);
             end
-            outFile=strcat(outFolder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_',kOutS,'_0001.ieeer8');
+            outFile=strcat(outFolder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_',kOutS,'_0001_',suffix);
         else
             inData = reshape(inData, iIn, jIn);
             cutData = inData(150:420, 1:180);
             outData = zeros(iOut, jOut);
             outData(:, :) = griddata(cutLat, cutLong, cutData(:, :), tLatOut, tLongOut, method3d);
-            outFile=strcat(outFolder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_0001_0001.ieeer8');
+            outFile=strcat(outFolder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_0001_0001_',suffix);
         end
         if(min(min(inData)) >= 0.0)
             outData(outData < 0) = 0;
