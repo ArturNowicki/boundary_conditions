@@ -16,7 +16,7 @@ function define_parameters {
 	angles_file_2km=${grids_path}'2km/anglet_2km.ieeer8'
 	thickness_file_2km=${grids_path}'2km/thickness_2km_600x640.txt'
 	bay_mask_file=${grids_path}'2km/3d_bay_mask_2km.ieeer8'
-	open_sea_mask_file=${grids_path}'2km/3d_bay_mask_2km.ieeer8'
+	open_sea_mask_file=${grids_path}'2km/3d_sea_mask_2km.ieeer8'
 
 	in_model_nc_prefix='hydro.pop.h.'
 	out_files_suffix='.ieeer8'
@@ -133,22 +133,22 @@ function run_rotate_vectors {
 
 function run_poisson_solver {
 	echo "Poisson solver"
-	files_to_process=`ls -1 ${bin_tmp_dir}*TEMP*${out_files_suffix} | wc -l`
+	files_to_process=`ls -1 ${bin_tmp_dir}*SSH*${out_files_suffix} | wc -l`
 	files_ctr=1
-	for in_file in ${bin_tmp_dir}*TEMP*${out_files_suffix}; do
+	for in_file in ${bin_tmp_dir}*SSH*${out_files_suffix}; do
 		progress_msg="Processing file ${files_ctr} of ${files_to_process}"
 		echo -ne ${progress_msg} '\r'
 		((files_ctr++))
 		out_file=${bin_spread_dir}${in_file/${bin_tmp_dir}}
 		z_dim_str=${out_file:(-16):4}
 		let z_dim=10#${z_dim_str}
-		# out_file1=${out_file/${out_files_suffix}}"_sea${out_files_suffix}"
-		# ./poisson_solver ${in_file} ${out_file1} ${open_sea_mask_file} ${x_in} ${y_in} ${z_dim}
-		# if [ $? -ne 0 ]; then
-		# 	exit
-		# fi
-		out_file2=${out_file/${out_files_suffix}}"_bay${out_files_suffix}"
-		./poisson_solver ${in_file} ${out_file2} ${bay_mask_file} ${x_in} ${y_in} ${z_dim}
+		out_file_sea=${out_file/${out_files_suffix}}"_sea${out_files_suffix}"
+		./poisson_solver ${in_file} ${out_file_sea} ${open_sea_mask_file} ${x_in} ${y_in} ${z_dim}
+		if [ $? -ne 0 ]; then
+			exit
+		fi
+		out_file_bay=${out_file/${out_files_suffix}}"_bay${out_files_suffix}"
+		./poisson_solver ${in_file} ${out_file_bay} ${bay_mask_file} ${x_in} ${y_in} ${z_dim}
 		if [ $? -ne 0 ]; then
 			exit
 		fi
