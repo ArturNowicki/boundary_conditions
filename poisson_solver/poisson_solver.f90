@@ -12,7 +12,7 @@ program poissonSolver
     integer, parameter :: dp = selected_real_kind(15, 307)
     integer, parameter :: max_len = 512
     integer, parameter :: ms = 1000, grid_type = 1
-    real(kind=dp), parameter :: bad = -99., ct = 1.e-5
+    real(kind=dp), parameter :: ct = 1.e-5
 
     !--- data arrays
     real*8, dimension(:, :, :), allocatable :: in_data, out_data, mask
@@ -88,7 +88,7 @@ end program
 subroutine read_input_parameters(in_f_name, out_f_name, mask_f_name, in_x, in_y, in_z, status)
     implicit none
     character(len=512), intent(out) :: in_f_name, out_f_name, mask_f_name
-    character(len=5) in_x, in_y, in_z
+    character(len=5), intent(out) :: in_x, in_y, in_z
     integer, intent(out) :: status
     status = 0
     call getarg(1, in_f_name)
