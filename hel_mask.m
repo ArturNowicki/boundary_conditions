@@ -1,26 +1,35 @@
 close all;
 clear all;
-kmt_file='/Users/arturnowicki/IOPAN/data/grids/2km/kmt_2km.ieeer8';
-iIn = 600; jIn = 640;
+kmt_file = '/Users/arturnowicki/IOPAN/data/grids/115/kmt_115m_1000x640.ieeei4';
+iIn = 1000; jIn = 640;
 fid = fopen(kmt_file, 'r', 'b');
-    kmt = fread(fid, [iIn jIn], 'double');
+    kmt = fread(fid, [iIn jIn], 'int');
 fclose(fid);
 %%
-tt = 21
+tt = 0
 mask=zeros(size(kmt));
 mask(kmt>tt) = 1;
+mm = 0;
+mask(55:83,1:502)=mm;
+mask(84:96,1:494)=mm;
+mask(97:102,1:490)=mm;
+mask(103:115,1:481)=mm;
+mask(116:131,1:472)=mm;
+mask(132:142,1:464)=mm;
+mask(143:154,1:457)=mm;
+mask(155:163,1:451)=mm;
+mask(164:175,1:444)=mm;
+mask(176:184,1:439)=mm;
+mask(185:190,1:431)=mm;
+mask(191:205,1:425)=mm;
+mask(206:218,1:416)=mm;
+mask(219:225,1:410)=mm;
+mask(226:235,1:403)=mm;
+mask(236:245,1:390)=mm;
+mask(245:265,1:374)=mm;
+mask(266:290,1:340)=mm;
+mask(291:294,1:330)=mm;
 
-mask(323,40:79)=0;
-mask(324,40:79)=0;
-mask(325,40:79)=0;
-mask(326,40:77)=0;
-mask(327,40:75)=0;
-mask(328,40:74)=0;
-mask(329,40:73)=0;
-mask(330,40:71)=0;
-mask(331,40:71)=0;
-mask(332,40:59)=0;
-mask(333:345,30:59)=0;
 
 
 level = string(tt+1);
@@ -28,7 +37,7 @@ level = string(tt+1);
 pcolor(mask'); shading 'flat'; colorbar;
 % pcolor(kmt_lev'); shading 'flat'; colorbar;
 %%
-hel_msk=strcat('/Users/arturnowicki/IOPAN/data/grids/2km/masks/sea_mask_2km_',level,'.ieeer8')
+hel_msk=strcat('/Users/arturnowicki/IOPAN/data/grids/2km/masks/sea_mask_115m_',level,'.ieeer8')
 fid = fopen(hel_msk, 'w', 'b');
 fwrite(fid, mask, 'double');
 fclose(fid);

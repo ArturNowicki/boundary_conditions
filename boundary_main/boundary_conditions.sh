@@ -138,47 +138,38 @@ function run_rotate_vectors {
 
 function run_data_merge {
 	echo "Data merge"
-	./data_merge $1 $2 $3 $4 $5 $6 $7 $8 $9
+	./data_merge ${out_file_sea} ${out_file_bay} ${out_file_bay/"_bay"} ${open_sea_mask_file} ${bay_mask_file} ${x_in} ${y_in} ${z_dim}
 	if [ $? -ne 0 ]; then
 		exit
 	fi
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+	# rm ${out_file_sea}
+	# rm ${out_file_bay}
 }
 
 function run_poisson_solver {
 	echo "Poisson solver"
-	files_to_process=`ls -1 ${bin_tmp_dir}*SSH*${out_files_suffix} | wc -l`
+	files_to_process=`ls -1 ${bin_tmp_dir}*${out_files_suffix} | wc -l`
 	files_ctr=1
-	for in_file in ${bin_tmp_dir}*SSH*${out_files_suffix}; do
-		progress_msg="Processing file ${files_ctr} of ${files_to_process}"
+	for in_file in ${bin_tmp_dir}*${out_files_suffix}; do
+		progress_msg="Processing file ${files_ctr} of ${files_to_process}: ${in_file/${bin_tmp_dir}}"
 		echo -ne ${progress_msg} '\r'
 		((files_ctr++))
 		out_file=${bin_spread_dir}${in_file/${bin_tmp_dir}}
 		z_dim_str=${out_file:(-16):4}
 		let z_dim=10#${z_dim_str}
 		out_file_sea=${out_file/${out_files_suffix}}"_sea${out_files_suffix}"
-		# ./poisson_solver ${in_file} ${out_file_sea} ${open_sea_mask_file} ${x_in} ${y_in} ${z_dim}
+		./poisson_solver ${in_file} ${out_file_sea} ${open_sea_mask_file} ${x_in} ${y_in} ${z_dim}
 		if [ $? -ne 0 ]; then
 			exit
 		fi
 		out_file_bay=${out_file/${out_files_suffix}}"_bay${out_files_suffix}"
-		# ./poisson_solver ${in_file} ${out_file_bay} ${bay_mask_file} ${x_in} ${y_in} ${z_dim}
+		./poisson_solver ${in_file} ${out_file_bay} ${bay_mask_file} ${x_in} ${y_in} ${z_dim}
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		echo ${out_file_sea}
-		echo ${out_file_bay}
-		echo ${out_file_bay/"_bay"}
-		echo ${open_sea_mask_file}
-		echo ${bay_mask_file}
-		echo ${x_in}
-		echo ${y_in}
-		echo ${z_dim}
-		run_data_merge ${out_file_sea} ${out_file_bay} ${out_file_bay/"_bay"} ${open_sea_mask_file} ${bay_mask_file} ${x_in} ${y_in} ${z_dim}
-		if [ $? -ne 0 ]; then
-			exit
-		fi
-		# rm ${out_file_sea}
-		# rm ${out_file_bay}
 	done
 	echo -ne '\n'
 }

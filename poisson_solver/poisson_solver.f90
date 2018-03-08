@@ -241,7 +241,7 @@ end subroutine
 
       if (.not. done .and. n .le. maxscn) go to 100
 
-      write (6,99) text, n, resmax
+      ! write (6,99) text, n, resmax
 
    
 99    format (1x,'==> Extrapolated ',a15,' into land using ', i4, &
