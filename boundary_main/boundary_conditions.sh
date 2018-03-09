@@ -15,8 +15,10 @@ function define_parameters {
 	kmt_file_2km=${grids_path}'2km/kmt_2km.ieeer8'
 	angles_file_2km=${grids_path}'2km/anglet_2km.ieeer8'
 	thickness_file_2km=${grids_path}'2km/thickness_2km_600x640.txt'
-	bay_mask_file=${grids_path}'2km/3d_bay_mask_2km.ieeer8'
-	open_sea_mask_file=${grids_path}'2km/3d_sea_mask_2km.ieeer8'
+	in_bay_mask_file=${grids_path}'2km/3d_bay_mask_2km.ieeer8'
+	in_sea_mask_file=${grids_path}'2km/3d_sea_mask_2km.ieeer8'
+	out_bay_mask_file=${grids_path}'115m/3d_bay_mask_115m.ieeer8'
+	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
 
 	in_model_nc_prefix='hydro.pop.h.'
 	out_files_suffix='.ieeer8'
@@ -34,8 +36,10 @@ function define_parameters {
 	tmp_data_path='../../../data/boundary_conditions/tmp_data/'
 	out_data_path='../../../data/boundary_conditions/out_data/'
 
-	bin_tmp_dir="${tmp_data_path}tmp_bin_data/"
-	bin_spread_dir="${tmp_data_path}spread_data/"
+	bin_tmp_dir=${tmp_data_path}"tmp_bin_data/"
+	bin_spread_dir=${tmp_data_path}"spread_data/"
+	bin_merged_dir=${tmp_data_path}"merged_data/"
+	bin_interp_dir=${tmp_data_path}"interp_data/"
 
 	parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
 	params_to_avg_in=( 'UVEL' 'VVEL')
@@ -126,7 +130,8 @@ function run_rotate_vectors {
 	echo "Rotate SU and SV"
 	for in_file1 in ${bin_tmp_dir}*${params_to_avg_out}*${out_files_suffix}; do
 		in_file2="${in_file1/${params_to_avg_out[0]}/${params_to_avg_out[1]}}"
-		./rotate_vector_matrix ${in_file1} ${in_file2} ${in_file1} ${in_file2} ${angles_file_2km} ${kmt_file_2km}
+		./rotate_vector_matrix ${in_file1} ${in_file2} ${in_file1} ${in_file2} \
+		${angles_file_2km} ${kmt_file_2km}
 		if [ $? -ne 0 ]; then
 			exit
 		fi
@@ -136,37 +141,23 @@ function run_rotate_vectors {
 	done
 }
 
-function run_data_merge {
-	echo "Data merge"
-	./data_merge ${out_file_sea} ${out_file_bay} ${out_file_bay/"_bay"} ${open_sea_mask_file} ${bay_mask_file} ${x_in} ${y_in} ${z_dim}
-	if [ $? -ne 0 ]; then
-		exit
-	fi
-	if [ $? -ne 0 ]; then
-		exit
-	fi
-	# rm ${out_file_sea}
-	# rm ${out_file_bay}
-}
-
 function run_poisson_solver {
 	echo "Poisson solver"
-	files_to_process=`ls -1 ${bin_tmp_dir}*${out_files_suffix} | wc -l`
+	files_to_process=`ls -1 ${bin_tmp_dir}*SALT*${out_files_suffix} | wc -l`
 	files_ctr=1
-	for in_file in ${bin_tmp_dir}*${out_files_suffix}; do
+	for in_file in ${bin_tmp_dir}*SALT*${out_files_suffix}; do
 		progress_msg="Processing file ${files_ctr} of ${files_to_process}: ${in_file/${bin_tmp_dir}}"
 		echo -ne ${progress_msg} '\r'
 		((files_ctr++))
 		out_file=${bin_spread_dir}${in_file/${bin_tmp_dir}}
-		z_dim_str=${out_file:(-16):4}
-		let z_dim=10#${z_dim_str}
+		let z_dim=10#${out_file:(-16):4}
 		out_file_sea=${out_file/${out_files_suffix}}"_sea${out_files_suffix}"
-		./poisson_solver ${in_file} ${out_file_sea} ${open_sea_mask_file} ${x_in} ${y_in} ${z_dim}
+		./poisson_solver ${in_file} ${out_file_sea} ${in_sea_mask_file} ${x_in} ${y_in} ${z_dim}
 		if [ $? -ne 0 ]; then
 			exit
 		fi
 		out_file_bay=${out_file/${out_files_suffix}}"_bay${out_files_suffix}"
-		./poisson_solver ${in_file} ${out_file_bay} ${bay_mask_file} ${x_in} ${y_in} ${z_dim}
+		./poisson_solver ${in_file} ${out_file_bay} ${in_bay_mask_file} ${x_in} ${y_in} ${z_dim}
 		if [ $? -ne 0 ]; then
 			exit
 		fi
@@ -177,7 +168,7 @@ function run_poisson_solver {
 function run_interpolation {
 	echo "Interpolation"
 	in_path="'"${bin_spread_dir}"'"
-	out_path="'"${out_data_path}"'"
+	out_path="'"${bin_interp_dir}"'"
 	grid_size="'"${out_grid_size}"'"
 	matlab -nosplash -nodisplay -nodesktop -r "try; interpolate_data(${in_path}, ${out_path}, ${grid_size}); catch ME; display(ME.identifier); display(ME.message);  display(ME.stack); display(ME.cause); exit(1); end; quit"
 	if [ $? -ne 0 ]; then
@@ -185,6 +176,21 @@ function run_interpolation {
 		exit
 	fi
 }
+
+function run_data_merge {
+	echo "Data merge"
+	for in_file_bay in ${bin_interp_dir}*"bay"*; do
+		in_file_sea=${in_file_bay/"bay"/"sea"}
+		out_file=${out_data_path}${in_file_bay/${bin_interp_dir}}
+		out_file=${out_file/"_bay"}
+		let z_dim=10#${out_file:(-16):4}
+		./data_merge ${in_file_sea} ${in_file_bay} ${out_file} ${out_sea_mask_file} ${out_bay_mask_file} ${x_out} ${y_out} ${z_dim}
+		if [ $? -ne 0 ]; then
+			exit
+		fi
+	done
+}
+
 # ----------------------------------------------------------------
 # ------------------------------MAIN------------------------------
 # ----------------------------------------------------------------
@@ -203,7 +209,8 @@ make_dir ${out_data_path}
 if [[ $1 == 'compile' ]]; then
 	compile_programs
 else
-	if [[ ! -f netcdf_to_bin || ! -f average_over_depth || ! -f rotate_vector_matrix  || ! -f poisson_solver ]]; then
+	if [[ ! -f netcdf_to_bin || ! -f average_over_depth || ! -f rotate_vector_matrix \
+	|| ! -f poisson_solver ]]; then
 		echo "Compile all needed modules first!"
 		exit
 	fi
@@ -226,14 +233,20 @@ else
 	if [[ ${progress_status} -eq 3 ]]; then
 		run_poisson_solver
 		((progress_status++))
-		# rm ${bin_tmp_dir}*${out_files_suffix}
 		# echo ${progress_status} > ${progress_file}
+		# rm ${bin_tmp_dir}*${out_files_suffix}
 	fi
 	if [[ ${progress_status} -eq 4 ]]; then
 		run_interpolation
 		((progress_status++))
-		# rm ${bin_spread_dir}*${out_files_suffix}
 		# echo ${progress_status} > ${progress_file}
+		# rm ${bin_spread_dir}*${out_files_suffix}
+	fi
+	if [[ ${progress_status} -eq 5 ]]; then
+		run_data_merge
+		((progress_status++))
+		# echo ${progress_status} > ${progress_file}
+		# rm ${bin_interp_dir}*${out_files_suffix}
 	fi
 	echo "Done."
 fi

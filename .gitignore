@@ -11,3 +11,4 @@ boundary_main/netcdf_to_bin
 boundary_main/poisson_solver
 boundary_main/rotate_vector_matrix
 *.ieeer8
+boundary_main/data_merge

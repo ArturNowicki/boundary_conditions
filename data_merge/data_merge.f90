@@ -50,12 +50,19 @@ program poissonSolver
     read(104,rec=1) mask2
     close(104)
 
-
+    write(*,*) minval(mask1), maxval(mask1)
+    write(*,*) minval(mask2), maxval(mask2)
     open(105,file=trim(out_f_name),form='unformatted',status='replace', & 
           convert='big_endian',access='direct',recl=in_x*in_y*in_z*8)
 
-    ! write(102, rec=1) out_data
-    close(102)
+    where(mask2.eq.1)
+        out_data=in_data2
+    endwhere
+    where(mask1.eq.1)
+        out_data=in_data1
+    endwhere
+    write(105, rec=1) out_data
+    close(105)
 end program
 
 subroutine read_input_parameters(in_f1_name, in_f2_name, out_f_name, &
