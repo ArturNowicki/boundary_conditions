@@ -56,8 +56,8 @@ program poissonSolver
         zctr=0
         tmp_sum=0.
         mean_val=0.
-        do j = 1,in_y
-          do i=1,in_x
+        do j = 55, 95
+          do i = 310, 380
             if(mask(i,j,z_lev).eq.1) then
               zctr=zctr+1
               tmp_sum=tmp_sum+jnk(i,j)

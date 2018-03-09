@@ -143,9 +143,9 @@ function run_rotate_vectors {
 
 function run_poisson_solver {
 	echo "Poisson solver"
-	files_to_process=`ls -1 ${bin_tmp_dir}*SALT*${out_files_suffix} | wc -l`
+	files_to_process=`ls -1 ${bin_tmp_dir}*${out_files_suffix} | wc -l`
 	files_ctr=1
-	for in_file in ${bin_tmp_dir}*SALT*${out_files_suffix}; do
+	for in_file in ${bin_tmp_dir}*${out_files_suffix}; do
 		progress_msg="Processing file ${files_ctr} of ${files_to_process}: ${in_file/${bin_tmp_dir}}"
 		echo -ne ${progress_msg} '\r'
 		((files_ctr++))
@@ -233,19 +233,19 @@ else
 	if [[ ${progress_status} -eq 3 ]]; then
 		run_poisson_solver
 		((progress_status++))
-		# echo ${progress_status} > ${progress_file}
+		echo ${progress_status} > ${progress_file}
 		# rm ${bin_tmp_dir}*${out_files_suffix}
 	fi
 	if [[ ${progress_status} -eq 4 ]]; then
 		run_interpolation
 		((progress_status++))
-		# echo ${progress_status} > ${progress_file}
+		echo ${progress_status} > ${progress_file}
 		# rm ${bin_spread_dir}*${out_files_suffix}
 	fi
 	if [[ ${progress_status} -eq 5 ]]; then
 		run_data_merge
 		((progress_status++))
-		# echo ${progress_status} > ${progress_file}
+		echo ${progress_status} > ${progress_file}
 		# rm ${bin_interp_dir}*${out_files_suffix}
 	fi
 	echo "Done."
