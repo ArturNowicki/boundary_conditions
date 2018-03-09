@@ -2,3 +2,12 @@
 *log.txt
 *.jnl
 *.m~
+*.mod
+*.DS_Store
+input_data/config/progress.log
+boundary_main/rotate_vector_matrix
+boundary_main/average_over_depth
+boundary_main/netcdf_to_bin
+boundary_main/poisson_solver
+boundary_main/rotate_vector_matrix
+*.ieeer8

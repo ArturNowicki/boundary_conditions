@@ -6,7 +6,7 @@ fid = fopen(kmt_file, 'r', 'b');
     kmt = fread(fid, [iIn jIn], 'int');
 fclose(fid);
 %%
-tt = 0
+tt = 32;
 mask=zeros(size(kmt));
 mask(kmt>tt) = 1;
 mm = 0;
@@ -32,39 +32,38 @@ mask(291:294,1:330)=mm;
 
 
 
-level = string(tt+1);
-% pcolor(kmt_lev(300:350, 1:100)'); shading 'faceted'; colorbar;
+level = string(tt+2);
+% pcolor(mask(1:320, 300:550)'); shading 'flat'; colorbar;
 pcolor(mask'); shading 'flat'; colorbar;
-% pcolor(kmt_lev'); shading 'flat'; colorbar;
-%%
-hel_msk=strcat('/Users/arturnowicki/IOPAN/data/grids/2km/masks/sea_mask_115m_',level,'.ieeer8')
+
+hel_msk=strcat('/Users/arturnowicki/IOPAN/data/grids/115/masks/sea_mask_115m_',level,'.ieeer8')
 fid = fopen(hel_msk, 'w', 'b');
 fwrite(fid, mask, 'double');
 fclose(fid);
 
 %%
-iIn = 600; jIn = 640;
+iIn = 1000; jIn = 640;
 
-mask3d = zeros(600,640,21);
-for ii = 1:9
-    level = strcat('0',string(ii));
-    in_fname = strcat('/Users/arturnowicki/IOPAN/data/grids/2km/masks/sea_mask_2km_',level,'.ieeer8');
-    fid = fopen(in_fname, 'r', 'b');
-    data = fread(fid, [iIn jIn], 'double');
-    fclose(fid);
-    mask3d(:,:,ii) = data;
-end
-for ii = 10:21
+mask3d = zeros(iIn,jIn,33);
+% for ii = 1:9
+%     level = strcat('0',string(ii));
+%     in_fname = strcat('/Users/arturnowicki/IOPAN/data/grids/115/masks/sea_mask_115m_',level,'.ieeer8');
+%     fid = fopen(in_fname, 'r', 'b');
+%     data = fread(fid, [iIn jIn], 'double');
+%     fclose(fid);
+%     mask3d(:,:,ii) = data;
+% end
+for ii = 1:33
     level = string(ii);
-    in_fname = strcat('/Users/arturnowicki/IOPAN/data/grids/2km/masks/sea_mask_2km_',level,'.ieeer8');
+    in_fname = strcat('/Users/arturnowicki/IOPAN/data/grids/115/masks/sea_mask_115m_',level,'.ieeer8');
     fid = fopen(in_fname, 'r', 'b');
     data = fread(fid, [iIn jIn], 'double');
     fclose(fid);
     mask3d(:,:,ii) = data;
 end
-fid = fopen('/Users/arturnowicki/IOPAN/data/grids/2km/masks/3d_sea_mask_2km.ieeer8', 'w', 'b');
+fid = fopen('/Users/arturnowicki/IOPAN/data/grids/115/masks/3d_sea_mask_115m.ieeer8', 'w', 'b');
 fwrite(fid, mask3d, 'double');
 fclose(fid);
 
 %%
-pcolor(mask3d(:,:,6)'), shading 'flat', colorbar;
+pcolor(mask3d(:,:,33)'), shading 'flat', colorbar;
