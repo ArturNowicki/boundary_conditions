@@ -29,12 +29,12 @@ function define_parameters {
 	y_out=640
 	z_out=33
 	out_grid_size="115m"
-	# input_data_dir='/users/work/anowicki/FF_WP/2km_data/'
-	# tmp_data_path='/users/work/anowicki/FF_WP/tmp_data/'
-	# out_data_path='/users/work/anowicki/FF_WP/boundary_115m/'
-	input_data_dir='../../../data/boundary_conditions/2km_in_data/'
-	tmp_data_path='../../../data/boundary_conditions/tmp_data/'
-	out_data_path='../../../data/boundary_conditions/out_data/'
+	input_data_dir='/users/work/anowicki/FF_WP/2km_data/'
+	tmp_data_path='/users/work/anowicki/FF_WP/tmp_data/'
+	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/'
+	# input_data_dir='../../../data/boundary_conditions/2km_in_data/'
+	# tmp_data_path='../../../data/boundary_conditions/tmp_data/'
+	# out_data_path='../../../data/boundary_conditions/out_data/'
 
 	bin_tmp_dir=${tmp_data_path}"tmp_bin_data/"
 	bin_spread_dir=${tmp_data_path}"spread_data/"
@@ -45,12 +45,12 @@ function define_parameters {
 	params_to_avg_in=( 'UVEL' 'VVEL')
 	params_to_avg_out=( 'SU' 'SV')
 
-	# compiler='ifort'
-	# netcdf_inc='-I/apl/tryton/netcdf/4.4-intel/include'
-	# netcdf_lib='-L/apl/tryton/netcdf/4.4-intel/lib -lnetcdff -L/apl/tryton/hdf5/1.8.16-intel/lib -L/apl/tryton/netcdf/4.4-intel/lib -lnetcdf -lnetcdf'
-	compiler='gfortran'
-	netcdf_inc='-I/opt/local/include'
-	netcdf_lib='-L/opt/local/lib -lnetcdff -lnetcdf'
+	compiler='ifort'
+	netcdf_inc='-I/apl/tryton/netcdf/4.4-intel/include'
+	netcdf_lib='-L/apl/tryton/netcdf/4.4-intel/lib -lnetcdff -L/apl/tryton/hdf5/1.8.16-intel/lib -L/apl/tryton/netcdf/4.4-intel/lib -lnetcdf -lnetcdf'
+	# compiler='gfortran'
+	# netcdf_inc='-I/opt/local/include'
+	# netcdf_lib='-L/opt/local/lib -lnetcdff -lnetcdf'
 	commonL='../common_code/messages.f90 ../common_code/error_codes.f90'
 }
 
@@ -105,7 +105,7 @@ function run_netcdf_to_bin {
 				exit
 			fi
 		done
-		# gzip ${in_fpath}
+		gzip ${in_fpath}
 	done
 }
 
@@ -204,6 +204,8 @@ fi
 make_dir ${tmp_data_path}
 make_dir ${bin_tmp_dir}
 make_dir ${bin_spread_dir}
+make_dir ${bin_merged_dir}
+make_dir ${bin_interp_dir}
 make_dir ${out_data_path}
 
 if [[ $1 == 'compile' ]]; then
@@ -234,19 +236,19 @@ else
 		run_poisson_solver
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
-		# rm ${bin_tmp_dir}*${out_files_suffix}
+		rm ${bin_tmp_dir}*${out_files_suffix}
 	fi
 	if [[ ${progress_status} -eq 4 ]]; then
 		run_interpolation
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
-		# rm ${bin_spread_dir}*${out_files_suffix}
+		rm ${bin_spread_dir}*${out_files_suffix}
 	fi
 	if [[ ${progress_status} -eq 5 ]]; then
 		run_data_merge
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
-		# rm ${bin_interp_dir}*${out_files_suffix}
+		rm ${bin_interp_dir}*${out_files_suffix}
 	fi
 	echo "Done."
 fi
