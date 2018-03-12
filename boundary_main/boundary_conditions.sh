@@ -94,7 +94,7 @@ function make_dir {
 
 function run_netcdf_to_bin {
 	echo "Converting to binary files"
-	for in_fpath in ${input_data_dir}*'2018-01'*'.nc'; do
+	for in_fpath in ${input_data_dir}*'.nc'; do
 		in_file=${in_fpath/${input_data_dir}}
 		date_time=${in_file/${in_model_nc_prefix}}
 		date_time=${date_time/'.nc'}
