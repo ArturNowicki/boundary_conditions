@@ -20,7 +20,7 @@ function define_parameters {
 	out_bay_mask_file=${grids_path}'115m/3d_bay_mask_115m.ieeer8'
 	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
 
-	in_model_nc_prefix='hydro.pop.h.'
+	in_model_nc_prefix='run001.pop.h.'
 	out_files_suffix='.ieeer8'
 	x_in=600
 	y_in=640
@@ -41,10 +41,11 @@ function define_parameters {
 	bin_merged_dir=${tmp_data_path}"merged_data/"
 	bin_interp_dir=${tmp_data_path}"interp_data/"
 
-	parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
-	params_to_avg_in=( 'UVEL' 'VVEL')
-	params_to_avg_out=( 'SU' 'SV')
+#	parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
+#	params_to_avg_in=( 'UVEL' 'VVEL')
+#	params_to_avg_out=( 'SU' 'SV')
 
+	parameters_list=( 'NO3' 'diatChl')
 	compiler='ifort'
 	netcdf_inc='-I/apl/tryton/netcdf/4.4-intel/include'
 	netcdf_lib='-L/apl/tryton/netcdf/4.4-intel/lib -lnetcdff -L/apl/tryton/hdf5/1.8.16-intel/lib -L/apl/tryton/netcdf/4.4-intel/lib -lnetcdf -lnetcdf'
@@ -223,12 +224,12 @@ else
 		echo ${progress_status} > ${progress_file}
 	fi
 	if [[ ${progress_status} -eq 1 ]]; then
-		run_calculate_su_sv
+#		run_calculate_su_sv
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 	fi
 	if [[ ${progress_status} -eq 2 ]]; then
-		run_rotate_vectors
+#		run_rotate_vectors
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 	fi
