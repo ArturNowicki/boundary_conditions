@@ -65,7 +65,11 @@ function intepolate_data(inFolder, outFolder, gridSize)
 %        parpool(4);
 %    end
 
-    for inFile=files'
+    c = parcluster('local');
+    c.NumWorkers = 24;
+    parpool(c, c.NumWorkers);
+
+    parfor inFile=files'
         disp(inFile.name);
         splitString = strsplit(inFile.name, '_');
         dateTime = splitString{1};
@@ -105,7 +109,7 @@ end
 function outData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inVar3d)
     tmpVar3d = nan(iIn, jIn, kOut);
     for ii = 1:iIn
-        for jj = 1:jIn
+        parfor jj = 1:jIn
             warning('off', 'MATLAB:interp1:NaNstrip');
             tmpVar3d(ii, jj, :) = interp1(zIn', squeeze(inVar3d(ii, jj, :)), zOut', 'spline');
         end
