@@ -66,9 +66,9 @@ function intepolate_data(inFolder, outFolder, gridSize)
 %    end
 
     c = parcluster('local');
-    c.NumWorkers = 24;
+    c.NumWorkers = 8;
     parpool(c, c.NumWorkers);
-
+    tic
     for inFile=files'
         disp(inFile.name);
         splitString = strsplit(inFile.name, '_');
@@ -103,7 +103,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
         fwrite(fidOut, outData, 'double');
         fclose(fidOut);
     end
-
+    toc
 %    delete(gcp('nocreate'));
 end
 function outData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inVar3d)

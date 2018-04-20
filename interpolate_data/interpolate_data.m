@@ -1,116 +1,111 @@
 % specify input data
-inFolder = '../../../data/boundary_conditions/spread_data/';
-outFolder = '../../../data/boundary_conditions/out_data/';
-files = dir(strcat(inFolder,'*.ieeer8'));
-firstFile = files(1);
-splitString = strsplit(firstFile.name, '_');
-iIn = str2double(splitString{3});
-jIn = str2double(splitString{4});
-kIn = str2double(splitString{5});
-gridSize = '115';
-method2d = 'natural';
-method3d = 'natural';
-gridDataDirectory = strcat('../../../data/grids/', gridSize, '/');
-inDirectory = '../../../data/restarts/';
-sampleModelFile = '../../../data/sample2kmHydroData.nc'; % to read tLong, tLat
-levelsInFile = strcat('../../../data/grids/2km/vertical_2km_600x640.txt');
+function intepolate_data(inFolder, outFolder, gridSize)
+    files = dir(strcat(inFolder,'*.ieeer8'));
+    firstFile = files(1);
+    splitString = strsplit(firstFile.name, '_');
+    iIn = str2double(splitString{3});
+    jIn = str2double(splitString{4});
+    method2d = 'natural';
+    method3d = 'natural';
+    gridDataDirectory = strcat('../input_data/grids/', gridSize, '/');
+    levelsInFile = strcat('../input_data/grids/2km/vertical_2km_600x640.txt');
+    tLongInFile = strcat('../input_data/grids/2km/tLong_2km_600_640.ieeer8');
+    tLatInFile = strcat('../input_data/grids/2km/tLat_2km_600_640.ieeer8');
+    tLongOutFile = strcat(gridDataDirectory, 'tLong_', gridSize, '_1000x640.ieeer8');
+    tLatOutFile = strcat(gridDataDirectory, 'tLat_', gridSize, '_1000x640.ieeer8');
+    levelsOutFile = strcat(gridDataDirectory, 'vertical_', gridSize, '_1000x640.txt');
 
-tLongOutFile = strcat(gridDataDirectory, 'tLong_', gridSize, 'm_1000x640.ieeer8');
-tLatOutFile = strcat(gridDataDirectory, 'tLat_', gridSize, 'm_1000x640.ieeer8');
-levelsOutFile = strcat(gridDataDirectory, 'vertical_', gridSize, 'm_1000x640.txt');
+    % initialize variables
+    iOut = 1000; jOut = 640; kOut = 33;
+    iOutS = '1000'; jOutS = '0640'; kOutS = '0033';
+    iAreaMin = 180; iAreaMax = 420;
+    jAreaMin = 10; jAreaMax = 160;
 
-% initialize variables
-iOut = 1000; jOut = 640; kOut = 33;
-iOutS = '1000'; jOutS = '0640'; kOutS = '0033';
-iAreaMin = 180; iAreaMax = 420;
-jAreaMin = 10; jAreaMax = 160;
+    % read and process grids parameters
+    % in grid
 
-% read and process grids parameters
-% in grid
-ncidGrid = netcdf.open(sampleModelFile, 'NOWRITE');
-    varId = netcdf.inqVarID(ncidGrid, 'TLONG');
-    tLongIn = netcdf.getVar(ncidGrid, varId)/180*pi;
-    varId = netcdf.inqVarID(ncidGrid, 'TLAT');
-    tLatIn = netcdf.getVar(ncidGrid, varId)/180*pi;
-netcdf.close(ncidGrid);
-cutLat = tLatIn(150:420, 1:180);
-cutLong = tLongIn(150:420, 1:180);
-zIn=importdata(levelsInFile)';
-zIn(2:kIn+1) = zIn;
-zIn(1) = 0.0;
-
-fid = fopen(tLongOutFile, 'r', 'b');
-    tLongOut = fread(fid, [iOut jOut], 'double');
-fclose(fid);
-
-fid = fopen(tLatOutFile, 'r', 'b');
-    tLatOut = fread(fid, [iOut jOut], 'double');
-fclose(fid);
-
-levelsThickness=importdata(levelsOutFile)/100;
-levelsNo = size(levelsThickness, 1);
-zOut = nan(1,levelsNo);
-zOut(1) = levelsThickness(1);
-for ii = 2:levelsNo
-    zOut(ii) = zOut(ii - 1) + levelsThickness(ii);
-end
-tLatInMat = reshape(repmat(tLatIn, 1, kIn), iIn, jIn, kIn);
-tLongInMat = reshape(repmat(tLongIn, 1, kIn), iIn, jIn, kIn);
-tLatOutMat = reshape(repmat(tLatOut, 1, kOut), iOut, jOut, kOut);
-tLongOutMat = reshape(repmat(tLongOut, 1, kOut), iOut, jOut, kOut);
-
-cutLatMat = tLatInMat(150:420, 1:180, 1:14);
-cutLongMat = tLongInMat(150:420, 1:180, 1:14);
-
-clearvars tLongIn tLatIn tLongInMat tLatInMat levelsThickness 
-%% interpolate restart data
-pool = gcp('nocreate');
-if isempty(pool)
-    parpool(4);
-end
-
-for inFile=files'
-    disp(inFile.name);
-    splitString = strsplit(inFile.name, '_');
-    dateTime = splitString(1);
-    varName = splitString(2);
+    fid = fopen(tLongInFile, 'r', 'b');
+        tLongIn = fread(fid, [iIn jIn], 'double');
+    fclose(fid);
+    fid = fopen(tLatInFile, 'r', 'b');
+        tLatIn = fread(fid, [iIn jIn], 'double');
+    fclose(fid);
+    fid = fopen(tLongOutFile, 'r', 'b');
+        tLongOut = fread(fid, [iOut jOut], 'double');
+    fclose(fid);
+    fid = fopen(tLatOutFile, 'r', 'b');
+        tLatOut = fread(fid, [iOut jOut], 'double');
+    fclose(fid);
+    cutLat = tLatIn(150:420, 1:180);
+    cutLong = tLongIn(150:420, 1:180);
+    zIn=importdata(levelsInFile)';
+    kIn = size(zIn,2);
+    zIn(2:kIn+1) = zIn;
+    zIn(1) = 0.0;
     
-    kIn = str2double(splitString{5});
-    fidIn = fopen(strcat(inFolder, inFile.name), 'r', 'b');
-    inData = fread(fidIn, [iIn*jIn kIn], 'double');
-    fclose(fidIn);
-    if(kIn>1)
-        tic
-        inData = reshape(inData, iIn, jIn, kIn);
-        inData(:, :, 2:kIn+1) = inData;
-        tmpData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inData);    
-        cutData = tmpData(150:420, 1:180, :);
-        outData = zeros(iOut, jOut, kOut);
-        parfor kk = 1:kOut
-            outData(:, :, kk) = griddata(cutLat, cutLong, cutData(:, :, kk), tLatOut, tLongOut, method3d);
+    levelsThickness=importdata(levelsOutFile)/100;
+    levelsNo = size(levelsThickness, 1);
+    zOut = nan(1,levelsNo);
+    zOut(1) = levelsThickness(1);
+    for ii = 2:levelsNo
+        zOut(ii) = zOut(ii - 1) + levelsThickness(ii);
+    end
+    tLatInMat = reshape(repmat(tLatIn, 1, kIn), iIn, jIn, kIn);
+    tLongInMat = reshape(repmat(tLongIn, 1, kIn), iIn, jIn, kIn);
+    tLatOutMat = reshape(repmat(tLatOut, 1, kOut), iOut, jOut, kOut);
+    tLongOutMat = reshape(repmat(tLongOut, 1, kOut), iOut, jOut, kOut);
+
+    cutLatMat = tLatInMat(150:420, 1:180, 1:14);
+    cutLongMat = tLongInMat(150:420, 1:180, 1:14);
+
+    clearvars tLongIn tLatIn tLongInMat tLatInMat levelsThickness 
+    %% interpolate restart data
+%    pool = gcp('nocreate');
+%    if isempty(pool)
+%        parpool(4);
+%    end
+
+    c = parcluster('local');
+    c.NumWorkers = 24;
+    parpool(c, c.NumWorkers);
+
+    for inFile=files'
+        disp(inFile.name);
+        splitString = strsplit(inFile.name, '_');
+        dateTime = splitString{1};
+        varName = splitString{2};
+        kIn = str2double(splitString{5});
+        suffix = splitString{7};
+        fidIn = fopen(strcat(inFolder, inFile.name), 'r', 'b');
+        inData = fread(fidIn, [iIn*jIn kIn], 'double');
+        fclose(fidIn);
+        if(kIn>1)
+            inData = reshape(inData, iIn, jIn, kIn);
+            inData(:, :, 2:kIn+1) = inData;
+            tmpData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inData);    
+            cutData = tmpData(150:420, 1:180, :);
+            outData = zeros(iOut, jOut, kOut);
+            parfor kk = 1:kOut
+                outData(:, :, kk) = griddata(cutLat, cutLong, cutData(:, :, kk), tLatOut, tLongOut, method3d);
+            end
+            outFile=strcat(outFolder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_',kOutS,'_0001_',suffix);
+        else
+            inData = reshape(inData, iIn, jIn);
+            cutData = inData(150:420, 1:180);
+            outData = zeros(iOut, jOut);
+            outData(:, :) = griddata(cutLat, cutLong, cutData(:, :), tLatOut, tLongOut, method3d);
+            outFile=strcat(outFolder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_0001_0001_',suffix);
         end
-        outFile=strcat(outFilder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_',kOutS,'_0001.ieeer8');
-        tm2 = toc
-    else
-        tic
-        inData = reshape(inData, iIn, jIn);
-        cutData = inData(150:420, 1:180);
-        outData = zeros(iOut, jOut);
-        outData(:, :) = griddata(cutLat, cutLong, cutData(:, :), tLatOut, tLongOut, method3d);
-        outFile=strcat(outFilder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_0001_0001.ieeer8');
-        tm3 =toc
+        if(min(min(inData)) >= 0.0)
+            outData(outData < 0) = 0;
+        end
+        fidOut = fopen(outFile, 'w', 'b');
+        fwrite(fidOut, outData, 'double');
+        fclose(fidOut);
     end
-    if(min(min(inData)) >= 0.0)
-        outData(outData < 0) = 0;
-    end
-    fidOut = fopen(outFile, 'w', 'b');
-    fwrite(fidOut, outData, 'double');
-    fclose(fidOut);
-    break;
-end
-    
-delete(gcp('nocreate'));
 
+%    delete(gcp('nocreate'));
+end
 function outData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inVar3d)
     tmpVar3d = nan(iIn, jIn, kOut);
     for ii = 1:iIn
