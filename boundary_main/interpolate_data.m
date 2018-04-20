@@ -69,7 +69,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
     c.NumWorkers = 24;
     parpool(c, c.NumWorkers);
 
-    parfor inFile=files'
+    for inFile=files'
         disp(inFile.name);
         splitString = strsplit(inFile.name, '_');
         dateTime = splitString{1};
@@ -85,7 +85,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
             tmpData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inData);    
             cutData = tmpData(150:420, 1:180, :);
             outData = zeros(iOut, jOut, kOut);
-            for kk = 1:kOut
+            parfor kk = 1:kOut
                 outData(:, :, kk) = griddata(cutLat, cutLong, cutData(:, :, kk), tLatOut, tLongOut, method3d);
             end
             outFile=strcat(outFolder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_',kOutS,'_0001_',suffix);

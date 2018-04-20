@@ -31,9 +31,6 @@ function define_parameters {
 	input_data_dir='/users/work/anowicki/FF_WP/2km_data/'
 	tmp_data_path='/users/work/anowicki/FF_WP/tmp_data/'
 	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/'
-	# input_data_dir='../../../data/boundary_conditions/2km_in_data/'
-	# tmp_data_path='../../../data/boundary_conditions/tmp_data/'
-	# out_data_path='../../../data/boundary_conditions/out_data/'
 
 	bin_tmp_dir=${tmp_data_path}"tmp_bin_data/"
 	bin_spread_dir=${tmp_data_path}"spread_data/"
@@ -43,13 +40,10 @@ function define_parameters {
 #	parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
 #	params_to_avg_in=( 'UVEL' 'VVEL')
 #	params_to_avg_out=( 'SU' 'SV')
-
 	parameters_list=( 'NO3')
+
 	compiler='ifort'
 	netcdf_inc='-I/apl/tryton/netcdf/4.4-intel/include'
 	netcdf_lib='-L/apl/tryton/netcdf/4.4-intel/lib -lnetcdff -L/apl/tryton/hdf5/1.8.16-intel/lib -L/apl/tryton/netcdf/4.4-intel/lib -lnetcdf -lnetcdf'
-	# compiler='gfortran'
-	# netcdf_inc='-I/opt/local/include'
-	# netcdf_lib='-L/opt/local/lib -lnetcdff -lnetcdf'
 	commonL='../common_code/messages.f90 ../common_code/error_codes.f90'
 }

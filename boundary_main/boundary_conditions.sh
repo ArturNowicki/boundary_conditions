@@ -1,7 +1,10 @@
 #!/bin/bash
 # Created by Artur Nowicki on 06.02.2018.
 
-source ./settings.sh
+source ../settings/settings.sh
+if [[ $? -ne 0 ]]; then
+	exit
+fi
 
 function compile_programs {
 	echo "Compile netcdf_to_bin.f90."
@@ -144,6 +147,7 @@ function run_data_merge {
 # ----------------------------------------------------------------
 
 define_parameters
+
 if [[ ! -d ${input_data_dir} ]]; then
 	echo "WRONG INPUT DIRECTORY!!!"
 	echo ${input_data_dir}
@@ -160,7 +164,7 @@ if [[ $1 == 'compile' ]]; then
 	compile_programs
 else
 	if [[ ! -f netcdf_to_bin || ! -f average_over_depth || ! -f rotate_vector_matrix \
-	|| ! -f poisson_solver ]]; then
+	|| ! -f poisson_solver || ! -f interpolate_data.m || ! -f data_merge ]]; then
 		echo "Compile all needed modules first!"
 		exit
 	fi
