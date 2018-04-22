@@ -46,17 +46,22 @@ function make_dir {
 
 function run_netcdf_to_bin {
 	echo "Converting to binary files"
-	for in_fpath in ${input_data_dir}*${in_model_nc_prefix}*'.nc'; do
-		in_file=${in_fpath/${input_data_dir}}
-		date_time=${in_file/${in_model_nc_prefix}}
-		date_time=${date_time/'.nc'}
-		for parameter_name in "${parameters_list[@]}"; do
-			./netcdf_to_bin ${in_fpath} ${parameter_name} ${date_time} ${bin_tmp_dir}
-			if [ $? -ne 0 ]; then
-				exit
-			fi
-		done
-		# gzip ${in_fpath}
+	for in_fpath in ${input_data_dir}*${in_model_nc_prefix}*${in_add_mask}*'.nc'; do
+		hour=${in_fpath:(-8):5}
+		case $hour in
+		    '03600'|'25200'|'46800'|'68400')
+			in_file=${in_fpath/${input_data_dir}}
+			date_time=${in_file/${in_model_nc_prefix}}
+			date_time=${date_time/'.nc'}
+			for parameter_name in "${parameters_list[@]}"; do
+				./netcdf_to_bin ${in_fpath} ${parameter_name} ${date_time} ${bin_tmp_dir}
+				if [ $? -ne 0 ]; then
+					exit
+				fi
+			done
+		gzip ${in_fpath}
+		esac
+
 	done
 }
 

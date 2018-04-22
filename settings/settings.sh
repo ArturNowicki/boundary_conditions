@@ -1,6 +1,5 @@
 #!/bin/bash
 function define_parameters {
-
 	ok_status=0
 	err_missing_program_input=100
 	err_f_open=101
@@ -20,7 +19,8 @@ function define_parameters {
 	out_bay_mask_file=${grids_path}'115m/3d_bay_mask_115m.ieeer8'
 	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
 
-	in_model_nc_prefix='run001.pop.h.'
+	in_model_nc_prefix='waterpuck_hydro.pop.h.'
+	in_add_mask='2011'
 	out_files_suffix='.ieeer8'
 	x_in=600
 	y_in=640
@@ -29,23 +29,22 @@ function define_parameters {
 	y_out=640
 	z_out=33
 	out_grid_size="115m"
-	input_data_dir='../../../data/boundary_conditions/2km_in_data/'
-	tmp_data_path='../../../data/boundary_conditions/tmp_data/'
-	out_data_path='../../../data/boundary_conditions/out_data/'
+	input_data_dir='/users/work/mjanecki/models/waterpuck_hydro/run/'
+	tmp_data_path='/users/work/anowicki/FF_WP/tmp_data/'
+	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/'
 
 	bin_tmp_dir=${tmp_data_path}"tmp_bin_data/"
 	bin_spread_dir=${tmp_data_path}"spread_data/"
 	bin_merged_dir=${tmp_data_path}"merged_data/"
 	bin_interp_dir=${tmp_data_path}"interp_data/"
 
-#	parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
-#	params_to_avg_in=( 'UVEL' 'VVEL')
-#	params_to_avg_out=( 'SU' 'SV')
+	parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
+	params_to_avg_in=( 'UVEL' 'VVEL')
+	params_to_avg_out=( 'SU' 'SV')
+#	parameters_list=( 'NO3')
 
-	parameters_list=( 'NO3')
-
-	compiler='gfortran'
-	netcdf_inc='-I/opt/local/include'
-	netcdf_lib='-L/opt/local/lib -lnetcdff -lnetcdf'
+	compiler='ifort'
+	netcdf_inc='-I/apl/tryton/netcdf/4.4-intel/include'
+	netcdf_lib='-L/apl/tryton/netcdf/4.4-intel/lib -lnetcdff -L/apl/tryton/hdf5/1.8.16-intel/lib -L/apl/tryton/netcdf/4.4-intel/lib -lnetcdf -lnetcdf'
 	commonL='../common_code/messages.f90 ../common_code/error_codes.f90'
 }
