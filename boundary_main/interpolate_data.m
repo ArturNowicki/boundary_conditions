@@ -65,10 +65,10 @@ function intepolate_data(inFolder, outFolder, gridSize)
 %        parpool(4);
 %    end
 
-    c = parcluster('local');
-    c.NumWorkers = 8;
-    parpool(c, c.NumWorkers);
-    tic
+%     c = parcluster('local');
+%     c.NumWorkers = 8;
+%     parpool(c, c.NumWorkers);
+%     tic
     for inFile=files'
         disp(inFile.name);
         splitString = strsplit(inFile.name, '_');
@@ -85,7 +85,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
             tmpData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inData);    
             cutData = tmpData(150:420, 1:180, :);
             outData = zeros(iOut, jOut, kOut);
-            parfor kk = 1:kOut
+            for kk = 1:kOut
                 outData(:, :, kk) = griddata(cutLat, cutLong, cutData(:, :, kk), tLatOut, tLongOut, method3d);
             end
             outFile=strcat(outFolder,dateTime,'_',varName,'_',iOutS,'_',jOutS,'_',kOutS,'_0001_',suffix);
@@ -103,13 +103,13 @@ function intepolate_data(inFolder, outFolder, gridSize)
         fwrite(fidOut, outData, 'double');
         fclose(fidOut);
     end
-    toc
+%     toc
 %    delete(gcp('nocreate'));
 end
 function outData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inVar3d)
     tmpVar3d = nan(iIn, jIn, kOut);
     for ii = 1:iIn
-        parfor jj = 1:jIn
+        for jj = 1:jIn
             warning('off', 'MATLAB:interp1:NaNstrip');
             tmpVar3d(ii, jj, :) = interp1(zIn', squeeze(inVar3d(ii, jj, :)), zOut', 'spline');
         end
