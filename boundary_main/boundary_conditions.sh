@@ -99,9 +99,9 @@ function run_rotate_vectors {
 
 function run_poisson_solver {
 	echo "Poisson solver"
-	files_to_process=`ls -1 ${bin_tmp_dir}*${out_files_suffix} | wc -l`
+	files_to_process=`ls -1 ${bin_tmp_dir}*"SU"${out_files_suffix} | wc -l`
 	files_ctr=1
-	for in_file in ${bin_tmp_dir}*${out_files_suffix}; do
+	for in_file in ${bin_tmp_dir}*"SU"${out_files_suffix}; do
 		progress_msg="Processing file ${files_ctr} of ${files_to_process}: ${in_file/${bin_tmp_dir}}"
 		echo -ne ${progress_msg} '\r'
 		((files_ctr++))
@@ -180,12 +180,12 @@ else
 		echo ${progress_status} > ${progress_file}
 	fi
 	if [[ ${progress_status} -eq 1 ]]; then
-#		run_calculate_su_sv
+		run_calculate_su_sv
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 	fi
 	if [[ ${progress_status} -eq 2 ]]; then
-#		run_rotate_vectors
+		run_rotate_vectors
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 	fi
