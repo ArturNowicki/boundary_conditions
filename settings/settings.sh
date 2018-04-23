@@ -31,7 +31,7 @@ function define_parameters {
 	out_grid_size="115m"
 	input_data_dir='/users/work/mjanecki/models/waterpuck_hydro/run/'
 	tmp_data_path='/users/work/anowicki/FF_WP/tmp_data/'
-	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/'
+	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/2011/'
 
 	bin_tmp_dir=${tmp_data_path}"tmp_bin_data/"
 	bin_spread_dir=${tmp_data_path}"spread_data/"
