@@ -1,7 +1,7 @@
 #!/bin/csh -f
-#SBATCH -J valid1
+#SBATCH -J boundary_conditions
 #SBATCH -p batch
-#SBATCH --time 14:00:00
+#SBATCH --time 48:00:00
 #SBATCH --mail-type=END
 
 cd /users/kdm/anowicki/FF_WP/boundary_conditions/boundary_main/
