@@ -193,6 +193,7 @@ else
 		run_poisson_solver
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
+		exit
 		rm ${bin_tmp_dir}*${out_files_suffix}
 	fi
 	if [[ ${progress_status} -eq 4 ]]; then
