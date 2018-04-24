@@ -98,7 +98,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
         fwrite(fidOut, outData, 'double');
         fclose(fidOut);
     end
-%     toc
+    toc
 %    delete(gcp('nocreate'));
 end
 function outData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inVar3d)
