@@ -19,8 +19,8 @@ function define_parameters {
 	out_bay_mask_file=${grids_path}'115m/3d_bay_mask_115m.ieeer8'
 	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
 
-	in_model_nc_prefix='hydro.pop.h.'
-	in_add_mask='2016-06-06'
+	in_model_nc_prefix='waterpuck_hydro.pop.h.'
+	in_add_mask='2011-01-1'
 	out_files_suffix='.ieeer8'
 	x_in=600
 	y_in=640
@@ -29,7 +29,7 @@ function define_parameters {
 	y_out=640
 	z_out=33
 	out_grid_size="115m"
-	input_data_dir='/users/work/anowicki/FF_WP/2km_data/'
+	input_data_dir='/users/work/mjanecki/models/waterpuck_hydro/run/'
 	tmp_data_path='/users/work/anowicki/FF_WP/tmp_data/'
 	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/2011/'
 
