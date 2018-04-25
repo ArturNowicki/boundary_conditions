@@ -47,6 +47,10 @@ function make_dir {
 function run_netcdf_to_bin {
 	echo "Converting to binary files"
 	for in_fpath in ${input_data_dir}*${in_model_nc_prefix}*${in_add_mask}*'.nc'; do
+		if [ ! -e  ${in_fpath} ]; then
+			echo "No files matching given pattern: ${in_fpath}"
+			exit
+		fi
 		hour=${in_fpath:(-8):5}
 		case $hour in
 		    '03600'|'25200'|'46800'|'68400')
@@ -61,7 +65,6 @@ function run_netcdf_to_bin {
 			done
 		gzip ${in_fpath}
 		esac
-
 	done
 }
 

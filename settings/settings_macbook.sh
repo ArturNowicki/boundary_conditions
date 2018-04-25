@@ -39,11 +39,9 @@ function define_parameters {
 	bin_merged_dir=${tmp_data_path}"merged_data/"
 	bin_interp_dir=${tmp_data_path}"interp_data/"
 
-#	parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
-#	params_to_avg_in=( 'UVEL' 'VVEL')
-#	params_to_avg_out=( 'SU' 'SV')
-
-	parameters_list=( 'NO3')
+	parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
+	params_to_avg_in=( 'UVEL' 'VVEL')
+	params_to_avg_out=( 'SU' 'SV')
 
 	compiler='gfortran'
 	netcdf_inc='-I/opt/local/include'
