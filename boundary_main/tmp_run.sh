@@ -9,5 +9,5 @@ fi
 define_parameters
 
 for in_fpath in ${input_data_dir}*${in_model_nc_prefix}*${in_add_mask}*'.nc'; do
-	./boundary_conditions.sh
+	echo ${in_fpath}
 done

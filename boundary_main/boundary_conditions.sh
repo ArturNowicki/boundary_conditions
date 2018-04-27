@@ -46,8 +46,7 @@ function make_dir {
 
 function run_netcdf_to_bin {
 	echo "Converting to binary files"
-	in_fpath= $1
-	# for in_fpath in ${input_data_dir}*${in_model_nc_prefix}*${in_add_mask}*'.nc'; do
+	for in_fpath in ${input_data_dir}*${in_model_nc_prefix}*${in_add_mask}*'.nc'; do
 		if [ ! -e  ${in_fpath} ]; then
 			echo "No files matching given pattern: ${in_fpath}"
 			exit
@@ -66,7 +65,7 @@ function run_netcdf_to_bin {
 			done
 		gzip ${in_fpath}
 		esac
-	# done
+	done
 }
 
 function run_calculate_su_sv {
