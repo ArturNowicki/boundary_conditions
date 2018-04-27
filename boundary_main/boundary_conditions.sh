@@ -9,27 +9,27 @@ fi
 
 function compile_programs {
 	echo "Compile netcdf_to_bin.f90."
-	${compiler} ${commonL} ${netcdf_inc} ${comp_flags} ../netcdf_to_binary/netcdf_to_bin.f90 -o netcdf_to_bin  ${netcdf_lib}
+	${compiler} ${commonL} ${netcdf_inc} ../netcdf_to_binary/netcdf_to_bin.f90 -o netcdf_to_bin  ${netcdf_lib}
 	if [[ $? -ne 0 ]]; then
 		exit
 	fi
 	echo "Compile average_over_depth.f90."
-	${compiler} ${commonL} ${comp_flags} ../average_over_depth/average_over_depth.f90 -o average_over_depth
+	${compiler} ${commonL} ../average_over_depth/average_over_depth.f90 -o average_over_depth
 	if [[ $? -ne 0 ]]; then
 		exit
 	fi
 	echo "Compile rotate_vector_matrix.f90"
-	${compiler} ${commonL} ${comp_flags} ../rotate_vector/rotate_vector_matrix.f90 -o rotate_vector_matrix
+	${compiler} ${commonL} ../rotate_vector/rotate_vector_matrix.f90 -o rotate_vector_matrix
 	if [[ $? -ne 0 ]]; then
 		exit
 	fi
 	echo "Compile poisson_solver.f90."
-	${compiler} ${commonL} ${comp_flags} ../poisson_solver/poisson_solver.f90 -o poisson_solver
+	${compiler} ${commonL} ../poisson_solver/poisson_solver.f90 -o poisson_solver
 	if [[ $? -ne 0 ]]; then
 		exit
 	fi
 	echo "Compile data_merge.f90."
-	${compiler} ${commonL} ${comp_flags} ../data_merge/data_merge.f90 -o data_merge
+	${compiler} ${commonL} ../data_merge/data_merge.f90 -o data_merge
 	if [[ $? -ne 0 ]]; then
 		exit
 	fi
