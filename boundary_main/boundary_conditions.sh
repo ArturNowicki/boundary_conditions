@@ -3,6 +3,7 @@
 
 source ../settings/settings.sh
 if [[ $? -ne 0 ]]; then
+	echo "Error reading settings."
 	exit
 fi
 
