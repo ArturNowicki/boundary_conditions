@@ -6,5 +6,5 @@
 
 cd /users/kdm/anowicki/FF_WP/boundary_conditions/boundary_main/
 echo `date +"%Y-%m-%d %H:%M:%S"` "STARTING..."
-./boundary_conditions.sh > log.txt
+./boundary_conditions.sh
 echo `date +"%Y-%m-%d %H:%M:%S"` "DONE."
