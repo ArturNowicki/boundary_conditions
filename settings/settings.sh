@@ -30,6 +30,7 @@ function define_parameters {
 	y_out=640
 	z_out=33
 	out_grid_size="115m"
+
 	input_data_dir='/users/work/mjanecki/archive/waterpuck_hydro/ocn/2015/'
 	tmp_data_path='/users/work/anowicki/FF_WP/tmp_data/'${in_add_mask}'/'
 	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/2015/'
