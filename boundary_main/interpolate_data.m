@@ -61,7 +61,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
     clearvars tLongIn tLatIn tLongInMat tLatInMat levelsThickness 
     %% interpolate restart data
     c = parcluster('local');
-    c.NumWorkers = 24;
+    c.NumWorkers = 6;
     parpool(c, c.NumWorkers);
     tic
     for inFile=files'
