@@ -18,7 +18,7 @@ function define_parameters {
 	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
 
 	in_model_nc_prefix='waterpuck_hydro.pop.h.'
-	in_add_mask='2015-12'
+	in_add_mask='2016-01-01'
 	out_files_suffix='.ieeer8'
 
 	progress_file="progress_${in_add_mask}.log"
@@ -31,9 +31,9 @@ function define_parameters {
 	z_out=33
 	out_grid_size="115m"
 
-	input_data_dir='/users/work/mjanecki/archive/waterpuck_hydro/ocn/2015/'
+	input_data_dir='/users/work/mjanecki/archive/waterpuck_hydro/ocn/2016/'
 	tmp_data_path='/users/work/anowicki/FF_WP/tmp_data/'${in_add_mask}'/'
-	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/2015/'
+	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/2016/'
 
 	bin_tmp_dir=${tmp_data_path}"tmp_bin_data/"
 	bin_spread_dir=${tmp_data_path}"spread_data/"
