@@ -107,6 +107,7 @@ function run_rotate_vectors {
 }
 
 function run_calculate_transport {
+	echo "Calculate transport"
 	ssh_name='SSH'
 	for ssh_file in ${bin_tmp_dir}*${ssh_name}*${out_files_suffix}; do
 		in_file=${ssh_file/${bin_tmp_dir}}
