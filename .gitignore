@@ -12,3 +12,15 @@ boundary_main/poisson_solver
 boundary_main/rotate_vector_matrix
 *.ieeer8
 boundary_main/data_merge
+boundary_main/average_over_depth
+.DS_Store
+boundary_main/average_over_depth
+boundary_main/average_over_depth
+boundary_main/calculate_transport
+boundary_main/data_merge
+boundary_main/error_codes.mod
+boundary_main/messages.mod
+boundary_main/netcdf_to_bin
+input_data/grids/.DS_Store
+input_data/.DS_Store
+boundary_main/rotate_vector_matrix
