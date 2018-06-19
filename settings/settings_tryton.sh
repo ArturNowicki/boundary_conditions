@@ -41,8 +41,7 @@ function define_parameters {
 	bin_merged_dir=${tmp_data_path}"merged_data/"
 	bin_interp_dir=${tmp_data_path}"interp_data/"
 
-	# parameters_list=( 'TEMP' 'SALT' 'UVEL' 'VVEL' 'SSH')
-	parameters_list=('HU' 'SSH' 'UVEL' 'VVEL')
+	parameters_list=('TEMP' 'SALT' 'HU' 'SSH' 'UVEL' 'VVEL')
 	params_to_avg_in=('UVEL' 'VVEL')
 	params_to_avg_out=('SU' 'SV')
 	params_transport=('UH' 'VH')

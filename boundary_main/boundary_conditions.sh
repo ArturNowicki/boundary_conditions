@@ -221,11 +221,10 @@ else
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 	fi
-	rm ${bin_tmp_dir}*"HU"*
-	rm ${bin_tmp_dir}*"SSH"*
-	rm ${bin_tmp_dir}*"SU"*
-	rm ${bin_tmp_dir}*"SV"*
 	if [[ ${progress_status} -eq 4 ]]; then
+		rm ${bin_tmp_dir}*"HU"*
+		rm ${bin_tmp_dir}*"SU"*
+		rm ${bin_tmp_dir}*"SV"*
 		run_poisson_solver
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
