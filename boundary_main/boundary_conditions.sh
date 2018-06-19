@@ -23,6 +23,11 @@ function compile_programs {
 	if [[ $? -ne 0 ]]; then
 		exit
 	fi
+	echo "Compile calculate_transport.f90"
+	${compiler} ${commonL} ${comp_flags} ../calculate_transport/calculate_transport.f90 -o calculate_transport
+	if [[ $? -ne 0 ]]; then
+		exit
+	fi
 	echo "Compile poisson_solver.f90."
 	${compiler} ${commonL} ${comp_flags} ../poisson_solver/poisson_solver.f90 -o poisson_solver
 	if [[ $? -ne 0 ]]; then
@@ -98,6 +103,24 @@ function run_rotate_vectors {
 	done
 	for var_name in ${params_to_avg_in[@]}; do
 		rm ${bin_tmp_dir}*$var_name*
+	done
+}
+
+function run_calculate_transport {
+	echo "Calculate transport"
+	ssh_name='SSH'
+	for ssh_file in ${bin_tmp_dir}*${ssh_name}*${out_files_suffix}; do
+		in_file=${ssh_file/${bin_tmp_dir}}
+		IFS='_' read -r date_time rest_f_name <<< "$in_file"
+		hu_file=${bin_tmp_dir}${date_time}*'HU'*${out_files_suffix}
+		for ii in 0 1; do
+			s_file=${bin_tmp_dir}${date_time}*${params_to_avg_out[${ii}]}*${out_files_suffix}
+			t_file=${bin_tmp_dir}${date_time}"_"${params_transport[${ii}]}${rest_f_name:${#ssh_name}}
+			./calculate_transport ${ssh_file} ${hu_file} ${s_file} ${t_file}
+			if [ $? -ne 0 ]; then
+				exit
+			fi
+		done
 	done
 }
 
@@ -194,18 +217,26 @@ else
 		echo ${progress_status} > ${progress_file}
 	fi
 	if [[ ${progress_status} -eq 3 ]]; then
+		run_calculate_transport
+		((progress_status++))
+		echo ${progress_status} > ${progress_file}
+	fi
+	if [[ ${progress_status} -eq 4 ]]; then
+		rm ${bin_tmp_dir}*"HU"*
+		rm ${bin_tmp_dir}*"SU"*
+		rm ${bin_tmp_dir}*"SV"*
 		run_poisson_solver
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 		rm ${bin_tmp_dir}*${out_files_suffix}
 	fi
-	if [[ ${progress_status} -eq 4 ]]; then
+	if [[ ${progress_status} -eq 5 ]]; then
 		run_interpolation
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 		rm ${bin_spread_dir}*${out_files_suffix}
 	fi
-	if [[ ${progress_status} -eq 5 ]]; then
+	if [[ ${progress_status} -eq 6 ]]; then
 		run_data_merge
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
