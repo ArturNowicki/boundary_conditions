@@ -97,9 +97,10 @@ function intepolate_data(inFolder, outFolder, gridSize)
         fidOut = fopen(outFile, 'w', 'b');
         fwrite(fidOut, outData, 'double');
         fclose(fidOut);
+	delete strcat(inFolder, inFile.name);
     end
     toc
-%    delete(gcp('nocreate'));
+    delete(gcp('nocreate'));
 end
 function outData = verticalInterpolation(iIn, jIn, kOut, zIn, zOut, inVar3d)
     tmpVar3d = nan(iIn, jIn, kOut);
