@@ -6,6 +6,7 @@
 #SBATCH --reservation cembs4
 
 cd /users/kdm/anowicki/FF_WP/boundary_conditions/boundary_main/
+./set_reservations.sh
 echo `date +"%Y-%m-%d %H:%M:%S"` "STARTING..."
 ./boundary_conditions.sh
 echo `date +"%Y-%m-%d %H:%M:%S"` "DONE."

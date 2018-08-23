@@ -19,8 +19,8 @@ function define_parameters {
 	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
 
 	in_model_nc_prefix='waterpuck_hydro.pop.h.'
-	data_year='2012'
-	in_add_mask=${data_year}'-1'
+	data_year='2013'
+	in_add_mask=${data_year}'-0'
 	out_files_suffix='.ieeer8'
 
 	progress_file="progress_${in_add_mask}.log"
@@ -52,8 +52,4 @@ function define_parameters {
 	netcdf_inc='-I/apl/tryton/netcdf/4.4-intel/include'
 	netcdf_lib='-L/apl/tryton/netcdf/4.4-intel/lib -lnetcdff -L/apl/tryton/hdf5/1.8.16-intel/lib -L/apl/tryton/netcdf/4.4-intel/lib -lnetcdf -lnetcdf'
 	commonL='../common_code/messages.f90 ../common_code/error_codes.f90'
-	./set_reservations.sh
-	if [[ $? -ne 0 ]]; then
-		exit 1
-	fi
 }
