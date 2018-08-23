@@ -3,7 +3,8 @@
 *.jnl
 *.m~
 *.mod
-*.DS_Store
+*/.DS_Store
+.DS_STORE
 input_data/config/progress.log
 boundary_main/rotate_vector_matrix
 boundary_main/average_over_depth
