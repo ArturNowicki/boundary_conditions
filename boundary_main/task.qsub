@@ -1,12 +1,12 @@
 #!/bin/csh -f
 #SBATCH -J boundary_conditions
 #SBATCH -p batch
-#SBATCH --time 48:00:00
+#SBATCH --time 72:00:00
 #SBATCH --mail-type=END
-#SBATCH --reservation cembs4
 
+source env_vars.sh
+set_env_vars
 cd /users/kdm/anowicki/FF_WP/boundary_conditions/boundary_main/
-./set_reservations.sh
 echo `date +"%Y-%m-%d %H:%M:%S"` "STARTING..."
 ./boundary_conditions.sh
 echo `date +"%Y-%m-%d %H:%M:%S"` "DONE."

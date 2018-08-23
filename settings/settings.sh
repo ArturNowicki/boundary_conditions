@@ -19,8 +19,6 @@ function define_parameters {
 	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
 
 	in_model_nc_prefix='waterpuck_hydro.pop.h.'
-	data_year='2013'
-	in_add_mask=${data_year}'-0'
 	out_files_suffix='.ieeer8'
 
 	progress_file="progress_${in_add_mask}.log"
