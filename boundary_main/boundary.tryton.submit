@@ -1,0 +1,5 @@
+#!/bin/bash -f
+cd /users/kdm/anowicki/FF_WP/boundary_conditions/boundary_main/
+source ../settings/env_vars.sh
+set_env_vars
+qsub boundary.tryton.run
