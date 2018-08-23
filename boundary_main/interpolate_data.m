@@ -97,7 +97,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
         fidOut = fopen(outFile, 'w', 'b');
         fwrite(fidOut, outData, 'double');
         fclose(fidOut);
-	delete strcat(inFolder, inFile.name);
+        delete(strcat(inFolder, inFile.name));
     end
     toc
     delete(gcp('nocreate'));
