@@ -52,4 +52,8 @@ function define_parameters {
 	netcdf_inc='-I/apl/tryton/netcdf/4.4-intel/include'
 	netcdf_lib='-L/apl/tryton/netcdf/4.4-intel/lib -lnetcdff -L/apl/tryton/hdf5/1.8.16-intel/lib -L/apl/tryton/netcdf/4.4-intel/lib -lnetcdf -lnetcdf'
 	commonL='../common_code/messages.f90 ../common_code/error_codes.f90'
+	./set_reservations.sh
+	if [[ $? -ne 0 ]]; then
+		exit 1
+	fi
 }

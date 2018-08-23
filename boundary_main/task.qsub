@@ -3,6 +3,7 @@
 #SBATCH -p batch
 #SBATCH --time 48:00:00
 #SBATCH --mail-type=END
+#SBATCH --reservation cembs4
 
 cd /users/kdm/anowicki/FF_WP/boundary_conditions/boundary_main/
 echo `date +"%Y-%m-%d %H:%M:%S"` "STARTING..."
