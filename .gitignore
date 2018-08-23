@@ -5,6 +5,7 @@
 *.mod
 */.DS_Store
 .DS_STORE
+*.gz
 input_data/config/progress.log
 boundary_main/rotate_vector_matrix
 boundary_main/average_over_depth
@@ -14,7 +15,6 @@ boundary_main/rotate_vector_matrix
 *.ieeer8
 boundary_main/data_merge
 boundary_main/average_over_depth
-.DS_Store
 boundary_main/average_over_depth
 boundary_main/average_over_depth
 boundary_main/calculate_transport
