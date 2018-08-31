@@ -19,10 +19,9 @@ function define_parameters {
 	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
 
 	in_model_nc_prefix='run001.pop.h.'
-	in_add_mask='2011-01-01-03600'
 	out_files_suffix='.ieeer8'
 
-	progress_file="progress.log"
+	progress_file="progress_${in_add_mask}.log"
 
 	x_in=600
 	y_in=640
@@ -31,6 +30,7 @@ function define_parameters {
 	y_out=640
 	z_out=33
 	out_grid_size="115m"
+
 	input_data_dir='../../../data/boundary_conditions/2km_in_data/'
 	tmp_data_path='../../../data/boundary_conditions/tmp_data/'
 	out_data_path='../../../data/boundary_conditions/out_data/'
