@@ -200,6 +200,10 @@ else
 		echo "Compile all needed modules first!"
 		exit
 	fi
+	if [ ! -e  ${progress_file} ]; then
+		echo "WARNING: Progress file missing. Creating new file."
+		echo '0' > ${progress_file}
+	fi
 	read progress_status <${progress_file}
 	if [[ ${progress_status} -eq 0 ]]; then
 		run_netcdf_to_bin
