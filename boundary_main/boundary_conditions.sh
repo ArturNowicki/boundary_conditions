@@ -41,13 +41,10 @@ function compile_programs {
 }
 
 function make_dir {
-	if [[ ! -d $1 ]]; then
-		mkdir $1
-		if [[ $? -ne 0 ]]; then
-			exit
-		fi
+	mkdir -p $1
+	if [[ $? -ne 0 ]]; then
+		exit
 	fi
-
 }
 
 function run_netcdf_to_bin {
