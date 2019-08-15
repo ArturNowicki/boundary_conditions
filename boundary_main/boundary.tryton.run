@@ -1,8 +1,10 @@
 #!/bin/bash -f
 #SBATCH -J boundary_conditions
 #SBATCH -p batch
-#SBATCH --time 72:00:00
+#SBATCH -N 3
+#SBATCH --time 48:00:00
 #SBATCH --mail-type=END
+#SBATCH --reservation=cembs1
 
 cd /users/kdm/anowicki/FF_WP/boundary_conditions/boundary_main/
 echo `date +"%Y-%m-%d %H:%M:%S"` "STARTING..."

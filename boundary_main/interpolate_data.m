@@ -50,6 +50,8 @@ function intepolate_data(inFolder, outFolder, gridSize)
     for ii = 2:levelsNo
         zOut(ii) = zOut(ii - 1) + levelsThickness(ii);
     end
+    disp('levelsNo')
+    disp(levelsNo)
     tLatInMat = reshape(repmat(tLatIn, 1, kIn), iIn, jIn, kIn);
     tLongInMat = reshape(repmat(tLongIn, 1, kIn), iIn, jIn, kIn);
     tLatOutMat = reshape(repmat(tLatOut, 1, kOut), iOut, jOut, kOut);

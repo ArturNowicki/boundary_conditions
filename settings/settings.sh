@@ -42,7 +42,9 @@ function define_parameters {
 	z_in=21
 	x_out=1000
 	y_out=640
-	z_out=33
+### change this also in interpolate_data.m!!!!
+	z_out=33 # waterpuck
+#	z_out=26 # findfish
 	out_grid_size="115m"
 	out_files_suffix='.ieeer8'
 
@@ -52,6 +54,6 @@ function define_parameters {
 	thickness_file_2km=${grids_path}'2km/thickness_2km_600x640.txt'
 	in_bay_mask_file=${grids_path}'2km/3d_bay_mask_2km.ieeer8'
 	in_sea_mask_file=${grids_path}'2km/3d_sea_mask_2km.ieeer8'
-	out_bay_mask_file=${grids_path}'115m/3d_bay_mask_115m.ieeer8'
-	out_sea_mask_file=${grids_path}'115m/3d_sea_mask_115m.ieeer8'
+	out_bay_mask_file=${grids_path}${out_grid_size}'/3d_bay_mask_'${out_grid_size}'.ieeer8'
+	out_sea_mask_file=${grids_path}${out_grid_size}'/3d_sea_mask_'${out_grid_size}'.ieeer8'
 }

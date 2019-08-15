@@ -16,8 +16,8 @@ function intepolate_data(inFolder, outFolder, gridSize)
     levelsOutFile = strcat(gridDataDirectory, 'vertical_', gridSize, '_1000x640.txt');
 
     % initialize variables
-    iOut = 1000; jOut = 640; kOut = 33;
-    iOutS = '1000'; jOutS = '0640'; kOutS = '0033';
+    iOut = 1000; jOut = 640; kOut = 26;
+    iOutS = '1000'; jOutS = '0640'; kOutS = '0026';
     iAreaMin = 180; iAreaMax = 420;
     jAreaMin = 10; jAreaMax = 160;
 
@@ -97,7 +97,7 @@ function intepolate_data(inFolder, outFolder, gridSize)
         fidOut = fopen(outFile, 'w', 'b');
         fwrite(fidOut, outData, 'double');
         fclose(fidOut);
-	delete strcat(inFolder, inFile.name);
+        delete(strcat(inFolder, inFile.name));
     end
     toc
     delete(gcp('nocreate'));

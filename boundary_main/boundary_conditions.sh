@@ -63,10 +63,11 @@ function run_netcdf_to_bin {
 			for parameter_name in "${parameters_list[@]}"; do
 				./netcdf_to_bin ${in_fpath} ${parameter_name} ${date_time} ${bin_tmp_dir}
 				if [ $? -ne 0 ]; then
+					echo "Error in netcdf_to_bin!"
 					exit
 				fi
 			done
-		gzip ${in_fpath}
+		#gzip ${in_fpath}
 		esac
 	done
 }
@@ -82,6 +83,7 @@ function run_calculate_su_sv {
 			out_file="${tmp_str/0021/0001}"
 			./average_over_depth ${bin_tmp_dir} ${in_file} ${out_file} ${thickness_file_2km} ${kmt_file_2km}
 			if [ $? -ne 0 ]; then
+				echo "Error in average_over_depth!"
 				exit
 			fi
 		done
@@ -95,6 +97,7 @@ function run_rotate_vectors {
 		./rotate_vector_matrix ${in_file1} ${in_file2} ${in_file1} ${in_file2} \
 		${angles_file_2km} ${kmt_file_2km}
 		if [ $? -ne 0 ]; then
+			echo "Error in rotate_vectors!"
 			exit
 		fi
 	done
@@ -115,6 +118,7 @@ function run_calculate_transport {
 			t_file=${bin_tmp_dir}${date_time}"_"${params_transport[${ii}]}${rest_f_name:${#ssh_name}}
 			./calculate_transport ${ssh_file} ${hu_file} ${s_file} ${t_file}
 			if [ $? -ne 0 ]; then
+				echo "Error in calculate_transport!"
 				exit
 			fi
 		done
@@ -134,11 +138,13 @@ function run_poisson_solver {
 		out_file_sea=${out_file/${out_files_suffix}}"_sea${out_files_suffix}"
 		./poisson_solver ${in_file} ${out_file_sea} ${in_sea_mask_file} ${x_in} ${y_in} ${z_dim}
 		if [ $? -ne 0 ]; then
+			echo "Error in poisson_solver sea!"
 			exit
 		fi
 		out_file_bay=${out_file/${out_files_suffix}}"_bay${out_files_suffix}"
 		./poisson_solver ${in_file} ${out_file_bay} ${in_bay_mask_file} ${x_in} ${y_in} ${z_dim}
 		if [ $? -ne 0 ]; then
+			echo "Error in poisson_solver bay!"
 			exit
 		fi
 	done
@@ -166,6 +172,7 @@ function run_data_merge {
 		let z_dim=10#${out_file:(-16):4}
 		./data_merge ${in_file_sea} ${in_file_bay} ${out_file} ${out_sea_mask_file} ${out_bay_mask_file} ${x_out} ${y_out} ${z_dim}
 		if [ $? -ne 0 ]; then
+			echo "Error in data_merge!"
 			exit
 		fi
 	done
