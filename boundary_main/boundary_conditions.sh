@@ -215,17 +215,17 @@ else
 		echo ${progress_status} > ${progress_file}
 	fi
 	if [[ ${progress_status} -eq 1 ]]; then
-		run_calculate_su_sv
+#		run_calculate_su_sv
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 	fi
 	if [[ ${progress_status} -eq 2 ]]; then
-		run_rotate_vectors
+#		run_rotate_vectors
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 	fi
 	if [[ ${progress_status} -eq 3 ]]; then
-		run_calculate_transport
+#		run_calculate_transport
 		((progress_status++))
 		echo ${progress_status} > ${progress_file}
 	fi

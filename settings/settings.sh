@@ -15,7 +15,8 @@ function define_parameters {
 	out_data_path='/users/work/anowicki/FF_WP/boundary_115m/'${data_year}'/'
 
 # set calculated parameters
-	parameters_list=('TEMP' 'SALT' 'HU' 'SSH' 'UVEL' 'VVEL')
+#	parameters_list=('TEMP' 'SALT' 'HU' 'SSH' 'UVEL' 'VVEL')
+	parameters_list=('spC' 'spChl' 'diatC' 'diatChl' 'diazC' 'diazChl' 'zooC' 'O2' 'NH4' 'SiO3' 'NO3' 'PO4' 'DOC')
 	params_to_avg_in=('UVEL' 'VVEL')
 	params_to_avg_out=('SU' 'SV')
 	params_transport=('UH' 'VH')
